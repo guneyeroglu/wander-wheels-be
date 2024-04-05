@@ -20,6 +20,7 @@ func main() {
 	api.Get("/colors", models.GetAllColors)
 	api.Get("/brands", models.GetAllBrands)
 	api.Get("/models", models.GetAllModels)
+	api.Get("/cities", models.GetAllCities)
 
 	log.Fatal(app.Listen(":3000"))
 }

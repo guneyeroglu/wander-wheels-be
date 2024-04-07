@@ -9,6 +9,7 @@ import (
 type Color struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
+	Code string `json:"code"`
 }
 
 func GetAllColors(c *fiber.Ctx) error {
@@ -23,7 +24,8 @@ func GetAllColors(c *fiber.Ctx) error {
 			CASE 
 				WHEN $1 = 'tr_TR' then name_tr
 				ELSE name_en
-			END as name
+			END as name,
+			code
 		FROM colors
 		ORDER BY id ASC
 	`
@@ -37,7 +39,7 @@ func GetAllColors(c *fiber.Ctx) error {
 	for rows.Next() {
 		var color Color
 
-		err := rows.Scan(&color.Id, &color.Name)
+		err := rows.Scan(&color.Id, &color.Name, &color.Code)
 
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())

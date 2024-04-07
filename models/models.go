@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/guneyeroglu/wander-wheels-be/database"
+	"github.com/guneyeroglu/wander-wheels-be/utils"
 )
 
 type Model struct {
@@ -12,6 +13,7 @@ type Model struct {
 }
 
 func GetAllModels(c *fiber.Ctx) error {
+	lang := c.Locals("lang").(string)
 	db := database.ConnectDb()
 	defer db.Close()
 
@@ -25,7 +27,8 @@ func GetAllModels(c *fiber.Ctx) error {
 			B.name AS brand_name
 		FROM models AS M
 		JOIN brands AS B ON b.id = M.brand_id
-	`)
+		ORDER BY model_id ASC
+		`)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -45,5 +48,9 @@ func GetAllModels(c *fiber.Ctx) error {
 		models = append(models, model)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(models)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    models,
+		"message": utils.GetTranslation(lang, "success"),
+	})
 }

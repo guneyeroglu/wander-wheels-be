@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/guneyeroglu/wander-wheels-be/database"
+	"github.com/guneyeroglu/wander-wheels-be/utils"
 )
 
 type Color struct {
@@ -24,6 +25,7 @@ func GetAllColors(c *fiber.Ctx) error {
 				ELSE name_en
 			END as name
 		FROM colors
+		ORDER BY id ASC
 	`
 
 	rows, err := db.Query(query, lang)
@@ -44,5 +46,9 @@ func GetAllColors(c *fiber.Ctx) error {
 		colors = append(colors, color)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(colors)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    colors,
+		"message": utils.GetTranslation(lang, "success"),
+	})
 }

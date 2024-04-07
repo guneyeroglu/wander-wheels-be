@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/guneyeroglu/wander-wheels-be/database"
+	"github.com/guneyeroglu/wander-wheels-be/utils"
 )
 
 type Role struct {
@@ -18,6 +19,7 @@ type User struct {
 }
 
 func GetAllUsers(c *fiber.Ctx) error {
+	lang := c.Locals("lang").(string)
 	db := database.ConnectDb()
 	defer db.Close()
 
@@ -32,6 +34,8 @@ func GetAllUsers(c *fiber.Ctx) error {
 			R.name 
 		FROM users AS U
 		JOIN roles AS R ON r.id = u.role_id
+		ORDER BY U.username ASC
+
 	`)
 
 	if err != nil {
@@ -52,5 +56,9 @@ func GetAllUsers(c *fiber.Ctx) error {
 		users = append(users, user)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(users)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    users,
+		"message": utils.GetTranslation(lang, "success"),
+	})
 }

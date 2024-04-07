@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/guneyeroglu/wander-wheels-be/database"
+	"github.com/guneyeroglu/wander-wheels-be/utils"
 )
 
 type City struct {
@@ -11,6 +12,7 @@ type City struct {
 }
 
 func GetAllCities(c *fiber.Ctx) error {
+	lang := c.Locals("lang").(string)
 	db := database.ConnectDb()
 	defer db.Close()
 
@@ -21,6 +23,7 @@ func GetAllCities(c *fiber.Ctx) error {
 			id, 
 			name
 		FROM cities
+		ORDER BY id ASC
 	`)
 
 	if err != nil {
@@ -39,5 +42,9 @@ func GetAllCities(c *fiber.Ctx) error {
 		cities = append(cities, city)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(cities)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    cities,
+		"message": utils.GetTranslation(lang, "success"),
+	})
 }

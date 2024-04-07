@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/guneyeroglu/wander-wheels-be/database"
+	"github.com/guneyeroglu/wander-wheels-be/utils"
 )
 
 type Fuel struct {
@@ -24,6 +25,7 @@ func GetAllFuels(c *fiber.Ctx) error {
 				ELSE name_en
 			END as name
 		FROM fuels
+		ORDER BY id ASC
 	`
 
 	rows, err := db.Query(query, lang)
@@ -44,5 +46,9 @@ func GetAllFuels(c *fiber.Ctx) error {
 		fuels = append(fuels, fuel)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fuels)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    fuels,
+		"message": utils.GetTranslation(lang, "success"),
+	})
 }

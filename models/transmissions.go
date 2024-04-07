@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/guneyeroglu/wander-wheels-be/database"
+	"github.com/guneyeroglu/wander-wheels-be/utils"
 )
 
 type Transmission struct {
@@ -24,6 +25,7 @@ func GetAllTransmissions(c *fiber.Ctx) error {
 				ELSE name_en
 			END as name
 		FROM transmissions
+		ORDER BY id ASC
 	`
 
 	rows, err := db.Query(query, lang)
@@ -44,5 +46,9 @@ func GetAllTransmissions(c *fiber.Ctx) error {
 		transmissions = append(transmissions, transmission)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(transmissions)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    transmissions,
+		"message": utils.GetTranslation(lang, "success"),
+	})
 }

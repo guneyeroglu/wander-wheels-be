@@ -9,7 +9,7 @@ func Language(c *fiber.Ctx) error {
 	lang := c.Get("Accept-Language")
 
 	if lang == "" {
-		lang = "en-EN"
+		lang = "en_EN"
 	}
 
 	c.Locals("lang", lang)

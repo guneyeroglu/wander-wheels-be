@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/guneyeroglu/wander-wheels-be/database"
+	"github.com/guneyeroglu/wander-wheels-be/utils"
 	"github.com/lib/pq"
 )
 
@@ -27,6 +28,21 @@ type Car struct {
 	CreatedDate  time.Time    `json:"createdDate"`
 	UpdatedDate  time.Time    `json:"updatedDate"`
 }
+
+type Data struct {
+	ModelId        *int `json:"modelId,omitempty"`
+	BrandId        *int `json:"brandId,omitempty"`
+	ColorId        *int `json:"colorId,omitempty"`
+	TransmissionId *int `json:"transmissionId,omitempty"`
+	FuelId         *int `json:"fuelId,omitempty"`
+	MinYear        *int `json:"minYear,omitempty"`
+	MaxYear        *int `json:"maxYear,omitempty"`
+	MinPrice       *int `json:"minPrice,omitempty"`
+	MaxPrice       *int `json:"maxPrice,omitempty"`
+	Seat           *int `json:"seat,omitempty"`
+}
+
+type Translations map[string]map[string]string
 
 func GetAllCars(c *fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
@@ -70,10 +86,40 @@ func GetAllCars(c *fiber.Ctx) error {
 		JOIN fuels AS F ON F.id = CA.fuel_id
 		JOIN transmissions AS T ON T.id = CA.transmission_id
 		JOIN colors AS CO ON CO.id = CA.color_id
+		WHERE 
+			(M.id = $2 OR $2 IS NULL) AND
+			(B.id = $3 OR $3 IS NULL) AND
+			(CO.id = $4 OR $4 IS NULL) AND
+			(T.id = $5 OR $5 IS NULL) AND
+			(F.id = $6 OR $6 IS NULL) AND
+			(CA.year >= $7 OR $7 IS NULL) AND
+			(CA.year <= $8 OR $8 IS NULL) AND
+			(CA.daily_price >= $9 OR $9 IS NULL) AND
+			(CA.daily_price <= $10 OR $10 IS NULL) AND
+			(CA.seat = $11 OR $11 IS NULL)
 		ORDER BY M.name
 `
 
-	rows, err := db.Query(query, lang)
+	var data Data
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	rows, err := db.Query(
+		query,               // query
+		lang,                // $1
+		data.ModelId,        // $2
+		data.BrandId,        // $3
+		data.ColorId,        // $4
+		data.TransmissionId, // $5
+		data.FuelId,         // $6
+		data.MinYear,        // $7
+		data.MaxYear,        // $8
+		data.MinPrice,       // $9
+		data.MaxPrice,       // $10
+		data.Seat,           // $11
+	)
 
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -114,5 +160,9 @@ func GetAllCars(c *fiber.Ctx) error {
 		cars = append(cars, car)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(cars)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    cars,
+		"message": utils.GetTranslation(lang, "success"),
+	})
 }

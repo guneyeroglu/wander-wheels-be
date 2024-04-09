@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/guneyeroglu/wander-wheels-be/database"
 	"github.com/guneyeroglu/wander-wheels-be/utils"
@@ -27,14 +27,14 @@ type LoginData struct {
 	Password string `json:"password"`
 }
 
-func Login(c *fiber.Ctx) error {
+func Login(c fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
 	db := database.ConnectDb()
 	defer db.Close()
 
 	var data LoginData
 
-	if err := c.BodyParser(&data); err != nil {
+	if err := c.Bind().JSON(&data); err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"status":  fiber.StatusUnprocessableEntity,
 			"message": err.Error(),
@@ -112,7 +112,7 @@ type SignUpData struct {
 	Password *string `json:"password"`
 }
 
-func SignUp(c *fiber.Ctx) error {
+func SignUp(c fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
 	roleId := 2 // customer
 	db := database.ConnectDb()
@@ -136,7 +136,7 @@ func SignUp(c *fiber.Ctx) error {
 
 	var data SignUpData
 
-	if err := c.BodyParser(&data); err != nil {
+	if err := c.Bind().JSON(&data); err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"status":  fiber.StatusUnprocessableEntity,
 			"message": err.Error(),

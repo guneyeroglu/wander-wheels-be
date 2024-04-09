@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
-func Language(c *fiber.Ctx) error {
+func Language(c fiber.Ctx) error {
 
 	lang := c.Get("Accept-Language")
 

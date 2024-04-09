@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/guneyeroglu/wander-wheels-be/database"
 	"github.com/guneyeroglu/wander-wheels-be/utils"
@@ -44,7 +44,7 @@ type CarData struct {
 
 type Translations map[string]map[string]string
 
-func GetAllCars(c *fiber.Ctx) error {
+func GetAllCars(c fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
 	db := database.ConnectDb()
 	defer db.Close()
@@ -103,7 +103,7 @@ func GetAllCars(c *fiber.Ctx) error {
 
 	var data CarData
 
-	if err := c.BodyParser(&data); err != nil {
+	if err := c.Bind().JSON(&data); err != nil {
 		return err
 	}
 

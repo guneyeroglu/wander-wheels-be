@@ -1,8 +1,14 @@
 {
   "tr_TR": {
-    "success": "İşlem başarılı!"
+    "success": "İşlem başarılı!",
+    "notFound": "Bulunamadı",
+    "newUserCreated": "Başarıyla hesap oluşturuldu.",
+    "userAlreadyExists": "Bu kullanıcı zaten mevcut."
   },
   "en_EN": {
-    "success": "Process successful!"
+    "success": "Process successful!",
+    "notFound": "Not Found",
+    "newUserCreated": "Successfully created account.",
+    "userAlreadyExists": "This user already exists."
   }
 }

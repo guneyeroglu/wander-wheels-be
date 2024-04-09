@@ -27,7 +27,10 @@ func GetAllBrands(c *fiber.Ctx) error {
 	`)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
 	}
 
 	for rows.Next() {
@@ -36,7 +39,10 @@ func GetAllBrands(c *fiber.Ctx) error {
 		err := rows.Scan(&brand.Id, &brand.Name)
 
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
 		}
 
 		brands = append(brands, brand)

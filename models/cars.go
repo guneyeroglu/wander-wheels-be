@@ -29,7 +29,7 @@ type Car struct {
 	UpdatedDate  time.Time    `json:"updatedDate"`
 }
 
-type Data struct {
+type CarData struct {
 	ModelId        *int `json:"modelId,omitempty"`
 	BrandId        *int `json:"brandId,omitempty"`
 	ColorId        *int `json:"colorId,omitempty"`
@@ -63,6 +63,7 @@ func GetAllCars(c *fiber.Ctx) error {
 				WHEN $1 = 'tr_TR' then CO.name_tr
 				ELSE CO.name_en
 			END as color_name,
+			CO.code as color_code,
 			T.id AS transmission_id, 
 			CASE
 				WHEN $1 = 'tr_TR' then T.name_tr
@@ -98,9 +99,9 @@ func GetAllCars(c *fiber.Ctx) error {
 			(CA.daily_price <= $10 OR $10 IS NULL) AND
 			(CA.seat = $11 OR $11 IS NULL)
 		ORDER BY M.name
-`
+	`
 
-	var data Data
+	var data CarData
 
 	if err := c.BodyParser(&data); err != nil {
 		return err
@@ -122,7 +123,10 @@ func GetAllCars(c *fiber.Ctx) error {
 	)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
 	}
 
 	for rows.Next() {
@@ -136,7 +140,7 @@ func GetAllCars(c *fiber.Ctx) error {
 		err := rows.Scan(
 			&car.Id,
 			&model.Id, &model.Name, &model.Brand.Id, &model.Brand.Name,
-			&color.Id, &color.Name,
+			&color.Id, &color.Name, &color.Code,
 			&transmission.Id, &transmission.Name,
 			&fuel.Id, &fuel.Name,
 			&car.Year,
@@ -148,7 +152,10 @@ func GetAllCars(c *fiber.Ctx) error {
 		)
 
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
 		}
 
 		car.Model = model

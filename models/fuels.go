@@ -31,7 +31,10 @@ func GetAllFuels(c *fiber.Ctx) error {
 	rows, err := db.Query(query, lang)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
 	}
 
 	for rows.Next() {
@@ -40,7 +43,10 @@ func GetAllFuels(c *fiber.Ctx) error {
 		err := rows.Scan(&fuel.Id, &fuel.Name)
 
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
 		}
 
 		fuels = append(fuels, fuel)

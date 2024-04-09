@@ -14,7 +14,8 @@ func main() {
 	app.Use(cors.New(), middleware.Language)
 	api := app.Group("/api")
 
-	api.Get("/users", models.GetAllUsers)
+	api.Post("/login", models.Login)
+	api.Post("/sign-up", models.SignUp)
 	api.Get("/fuels", models.GetAllFuels)
 	api.Get("/transmissions", models.GetAllTransmissions)
 	api.Get("/colors", models.GetAllColors)

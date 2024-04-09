@@ -33,7 +33,10 @@ func GetAllColors(c *fiber.Ctx) error {
 	rows, err := db.Query(query, lang)
 
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
 	}
 
 	for rows.Next() {
@@ -42,7 +45,10 @@ func GetAllColors(c *fiber.Ctx) error {
 		err := rows.Scan(&color.Id, &color.Name, &color.Code)
 
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
 		}
 
 		colors = append(colors, color)

@@ -18,13 +18,15 @@ func GetAllBrands(c *fiber.Ctx) error {
 
 	var brands []Brand
 
-	rows, err := db.Query(`
+	query := `
 		SELECT 
 			id, 
 			name
 		FROM brands
 		ORDER BY id ASC
-	`)
+	`
+
+	rows, err := db.Query(query)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{

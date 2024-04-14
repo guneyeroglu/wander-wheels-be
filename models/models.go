@@ -19,7 +19,7 @@ func GetAllModels(c *fiber.Ctx) error {
 
 	var models []Model
 
-	rows, err := db.Query(`
+	query := `
 		SELECT 
 			M.id AS model_id, 
 			M.name AS model_name,
@@ -28,7 +28,9 @@ func GetAllModels(c *fiber.Ctx) error {
 		FROM models AS M
 		JOIN brands AS B ON b.id = M.brand_id
 		ORDER BY model_id ASC
-		`)
+	`
+
+	rows, err := db.Query(query)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
@@ -51,6 +53,7 @@ func GetAllModels(c *fiber.Ctx) error {
 		}
 
 		model.Brand = brand
+
 		models = append(models, model)
 	}
 

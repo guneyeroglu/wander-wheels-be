@@ -63,7 +63,11 @@ func Login(c *fiber.Ctx) error {
 		ORDER BY U.username ASC
 	`
 
-	rows, err := db.Query(query, data.Username, data.Password)
+	rows, err := db.Query(
+		query,         //query
+		data.Username, // $1
+		data.Password, // $2
+	)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
@@ -86,6 +90,7 @@ func Login(c *fiber.Ctx) error {
 		}
 
 		user.Role = role
+
 		userData = append(userData, user)
 	}
 
@@ -166,7 +171,10 @@ func GetUserInfo(c *fiber.Ctx) error {
 		ORDER BY U.username ASC
 	`
 
-	rows, err := db.Query(query, id)
+	rows, err := db.Query(
+		query, // query
+		id,    // $1
+	)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
@@ -189,6 +197,7 @@ func GetUserInfo(c *fiber.Ctx) error {
 		}
 
 		user.Role = role
+
 		users = append(users, user)
 	}
 
@@ -253,7 +262,11 @@ func SignUp(c *fiber.Ctx) error {
 
 	var users []User
 
-	rowsForFindingUser, errForFindingUser := db.Query(queryForFindingUser, data.Username, data.Password)
+	rowsForFindingUser, errForFindingUser := db.Query(
+		queryForFindingUser, // query
+		data.Username,       // $1
+		data.Password,       // $2
+	)
 
 	if errForFindingUser != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
@@ -276,6 +289,7 @@ func SignUp(c *fiber.Ctx) error {
 		}
 
 		user.Role = role
+
 		users = append(users, user)
 	}
 
@@ -301,7 +315,13 @@ func SignUp(c *fiber.Ctx) error {
 		);
 	`
 
-	_, err := db.Query(query, data.Username, data.Mail, data.Password, roleId)
+	_, err := db.Query(
+		query,         // query
+		data.Username, // $1
+		data.Mail,     // $2
+		data.Password, // $3
+		roleId,        // $4
+	)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{

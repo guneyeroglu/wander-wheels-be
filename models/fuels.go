@@ -17,6 +17,7 @@ func GetAllFuels(c *fiber.Ctx) error {
 	defer db.Close()
 
 	var fuels []Fuel
+
 	query := `
 		SELECT 
 			id,
@@ -28,7 +29,10 @@ func GetAllFuels(c *fiber.Ctx) error {
 		ORDER BY id ASC
 	`
 
-	rows, err := db.Query(query, lang)
+	rows, err := db.Query(
+		query, //query
+		lang,  //$1
+	)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{

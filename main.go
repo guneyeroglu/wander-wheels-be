@@ -23,7 +23,8 @@ func main() {
 	api.Get("/brands", models.GetAllBrands)
 	api.Get("/models", models.GetAllModels)
 	api.Get("/cities", models.GetAllCities)
-	api.Get("/cars", models.GetAllCars)
+	api.Post("/cars", models.GetAllCars)
+	api.Post("/cars/:id", models.GetCarById)
 
 	log.Fatal(app.Listen(":3000"))
 }

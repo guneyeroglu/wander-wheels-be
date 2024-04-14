@@ -18,13 +18,15 @@ func GetAllCities(c *fiber.Ctx) error {
 
 	var cities []City
 
-	rows, err := db.Query(`
+	query := `
 		SELECT 
 			id, 
 			name
 		FROM cities
 		ORDER BY id ASC
-	`)
+	`
+
+	rows, err := db.Query(query)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{

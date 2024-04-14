@@ -17,6 +17,7 @@ func GetAllTransmissions(c *fiber.Ctx) error {
 	defer db.Close()
 
 	var transmissions []Transmission
+
 	query := `
 		SELECT 
 			id,

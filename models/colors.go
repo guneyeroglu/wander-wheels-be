@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"github.com/guneyeroglu/wander-wheels-be/database"
 	"github.com/guneyeroglu/wander-wheels-be/utils"
 )
@@ -12,7 +12,7 @@ type Color struct {
 	Code string `json:"code"`
 }
 
-func GetAllColors(c fiber.Ctx) error {
+func GetAllColors(c *fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
 	db := database.ConnectDb()
 	defer db.Close()

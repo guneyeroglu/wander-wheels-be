@@ -12,6 +12,7 @@ import (
 
 func ConnectDb() *sql.DB {
 	err := godotenv.Load()
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -24,6 +25,7 @@ func ConnectDb() *sql.DB {
 
 	connectionString := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=%s", dbUsername, dbPassword, dbPort, dbName, dbSslMode)
 	db, err := sql.Open("postgres", connectionString)
+
 	if err != nil {
 		log.Fatal("Error connecting to the database:", err)
 	}

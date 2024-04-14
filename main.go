@@ -3,19 +3,20 @@ package main
 import (
 	"log"
 
-	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/guneyeroglu/wander-wheels-be/middleware"
 	"github.com/guneyeroglu/wander-wheels-be/models"
 )
 
 func main() {
 	app := fiber.New()
-	app.Use(cors.New(), middleware.Language)
+	app.Use(cors.New(), middleware.Language, middleware.Jwt)
 	api := app.Group("/api")
 
 	api.Post("/login", models.Login)
 	api.Post("/sign-up", models.SignUp)
+	api.Get("/user-info", models.GetUserInfo)
 	api.Get("/fuels", models.GetAllFuels)
 	api.Get("/transmissions", models.GetAllTransmissions)
 	api.Get("/colors", models.GetAllColors)

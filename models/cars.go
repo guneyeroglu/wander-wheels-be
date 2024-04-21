@@ -325,6 +325,14 @@ func GetCarById(c *fiber.Ctx) error {
 		cars = append(cars, carAndCity)
 	}
 
+	if cars == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status":  fiber.StatusNotFound,
+			"data":    nil,
+			"message": utils.GetTranslation(lang, "notFound"),
+		})
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  fiber.StatusOK,
 		"data":    cars[0],

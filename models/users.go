@@ -56,7 +56,7 @@ func Login(c *fiber.Ctx) error {
 			R.id,
 			R.name
 		FROM users AS U
-		JOIN roles as R ON r.id = u.role_id
+		JOIN roles AS R ON r.id = u.role_id
 		WHERE 
 			(U.username = $1) AND
 			(U.password = $2)
@@ -64,7 +64,7 @@ func Login(c *fiber.Ctx) error {
 	`
 
 	rows, err := db.Query(
-		query,         //query
+		query,         // query
 		data.Username, // $1
 		data.Password, // $2
 	)

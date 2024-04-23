@@ -25,6 +25,9 @@ func main() {
 	api.Get("/cities", models.GetAllCities)
 	api.Post("/cars", models.GetAllCars)
 	api.Get("/cars/:id", models.GetCarById)
+	api.Get("/price-range", models.GetPriceRange)
+	api.Get("/year-range", models.GetYearRange)
+	api.Get("/seats", models.GetSeats)
 
 	log.Fatal(app.Listen(":3000"))
 }

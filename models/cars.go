@@ -35,20 +35,23 @@ type Car struct {
 	Car CarModel  `json:"car"`
 }
 
+type CarParams struct {
+	CityId    *int       `json:"cityId,omitempty"`
+	StartDate *time.Time `json:"startDate,omitempty"`
+	EndDate   *time.Time `json:"endDate,omitempty"`
+}
 type CarData struct {
-	ModelId        *int       `json:"modelId,omitempty"`
-	BrandId        *int       `json:"brandId,omitempty"`
-	ColorIds       []int      `json:"colorIds,omitempty"`
-	TransmissionId *int       `json:"transmissionId,omitempty"`
-	FuelId         *int       `json:"fuelId,omitempty"`
-	MinYear        *int       `json:"minYear,omitempty"`
-	MaxYear        *int       `json:"maxYear,omitempty"`
-	MinPrice       *int       `json:"minPrice,omitempty"`
-	MaxPrice       *int       `json:"maxPrice,omitempty"`
-	Seat           *int       `json:"seat,omitempty"`
-	CityId         *int       `json:"cityId,omitempty"`
-	StartDate      *time.Time `json:"startDate,omitempty"`
-	EndDate        *time.Time `json:"endDate,omitempty"`
+	ModelId        *int  `json:"modelId,omitempty"`
+	BrandId        *int  `json:"brandId,omitempty"`
+	ColorIds       []int `json:"colorIds,omitempty"`
+	TransmissionId *int  `json:"transmissionId,omitempty"`
+	FuelId         *int  `json:"fuelId,omitempty"`
+	MinYear        *int  `json:"minYear,omitempty"`
+	MaxYear        *int  `json:"maxYear,omitempty"`
+	MinPrice       *int  `json:"minPrice,omitempty"`
+	MaxPrice       *int  `json:"maxPrice,omitempty"`
+	Seat           *int  `json:"seat,omitempty"`
+	CarParams
 }
 
 type Translations map[string]map[string]string
@@ -73,18 +76,18 @@ func GetAllCars(c *fiber.Ctx) error {
 			CASE
 				WHEN $1 = 'tr_TR' then CO.name_tr
 				ELSE CO.name_en
-			END as color_name,
-			CO.code as color_code,
+			END AS color_name,
+			CO.code AS color_code,
 			T.id AS transmission_id, 
 			CASE
 				WHEN $1 = 'tr_TR' then T.name_tr
 				ELSE T.name_en
-			END as transmission_name,
+			END AS transmission_name,
 			F.id AS fuel_id,
 			CASE
 				WHEN $1 = 'tr_TR' then F.name_tr
 				ELSE F.name_en
-			END as transmission_name,
+			END AS transmission_name,
 			CA.year, 
 			CA.daily_price,
 			CA.featured_image, 
@@ -95,7 +98,7 @@ func GetAllCars(c *fiber.Ctx) error {
 			CA.created_date,
 			CA.updated_date
 		FROM cars_and_cities AS CC
-		JOIN cars as CA ON CA.id = CC.car_id
+		JOIN cars AS CA ON CA.id = CC.car_id
 		JOIN models AS M ON M.id = CA.model_id
 		JOIN brands AS B ON B.id = M.brand_id
 		JOIN fuels AS F ON F.id = CA.fuel_id
@@ -235,18 +238,18 @@ func GetCarById(c *fiber.Ctx) error {
 			CASE
 				WHEN $1 = 'tr_TR' then CO.name_tr
 				ELSE CO.name_en
-			END as color_name,
-			CO.code as color_code,
+			END AS color_name,
+			CO.code AS color_code,
 			T.id AS transmission_id, 
 			CASE
 				WHEN $1 = 'tr_TR' then T.name_tr
 				ELSE T.name_en
-			END as transmission_name,
+			END AS transmission_name,
 			F.id AS fuel_id,
 			CASE
 				WHEN $1 = 'tr_TR' then F.name_tr
 				ELSE F.name_en
-			END as transmission_name,
+			END AS transmission_name,
 			CA.year, 
 			CA.daily_price,
 			CA.featured_image, 
@@ -257,7 +260,7 @@ func GetCarById(c *fiber.Ctx) error {
 			CA.created_date,
 			CA.updated_date
 		FROM cars_and_cities AS CC
-		JOIN cars as CA ON CA.id = CC.car_id
+		JOIN cars AS CA ON CA.id = CC.car_id
 		JOIN models AS M ON M.id = CA.model_id
 		JOIN brands AS B ON B.id = M.brand_id
 		JOIN fuels AS F ON F.id = CA.fuel_id
@@ -336,6 +339,156 @@ func GetCarById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":  fiber.StatusOK,
 		"data":    cars[0],
+		"message": utils.GetTranslation(lang, "success"),
+	})
+}
+
+type Prices struct {
+	MinPrice int `json:"minPrice"`
+	MaxPrice int `json:"maxPrice"`
+}
+
+func GetPriceRange(c *fiber.Ctx) error {
+	lang := c.Locals("lang").(string)
+	db := database.ConnectDb()
+	defer db.Close()
+
+	var prices Prices
+
+	query := `
+		SELECT
+			MIN(C.daily_price) AS min_price,
+			MAX(C.daily_price) AS max_price
+		FROM cars_and_cities AS CC
+		JOIN cars AS C ON C.id = CC.car_id
+	`
+
+	rows, err := db.Query(query)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
+	}
+
+	for rows.Next() {
+		err := rows.Scan(
+			&prices.MinPrice,
+			&prices.MaxPrice,
+		)
+
+		if err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    prices,
+		"message": utils.GetTranslation(lang, "success"),
+	})
+}
+
+type Years struct {
+	MinYear int `json:"minYear"`
+	MaxYear int `json:"maxYear"`
+}
+
+func GetYearRange(c *fiber.Ctx) error {
+	lang := c.Locals("lang").(string)
+	db := database.ConnectDb()
+	defer db.Close()
+
+	var years Years
+
+	query := `
+		SELECT
+			MIN(C.year) AS min_year,
+			MAX(C.year) AS max_year
+		FROM cars_and_cities AS CC
+		JOIN cars AS C ON C.id = CC.car_id
+	`
+
+	rows, err := db.Query(query)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
+	}
+
+	for rows.Next() {
+		err := rows.Scan(
+			&years.MinYear,
+			&years.MaxYear,
+		)
+
+		if err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"data":    years,
+		"message": utils.GetTranslation(lang, "success"),
+	})
+}
+
+func GetSeats(c *fiber.Ctx) error {
+	lang := c.Locals("lang").(string)
+	db := database.ConnectDb()
+	defer db.Close()
+
+	var seats []int
+
+	query := `
+			SELECT DISTINCT
+			C.seat
+		FROM cars_and_cities AS CC
+		JOIN cars AS C ON C.id = CC.car_id
+		ORDER BY c.seat
+	`
+
+	rows, err := db.Query(query)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
+	}
+
+	for rows.Next() {
+		var seat int
+
+		err := rows.Scan(
+			&seat,
+		)
+
+		if err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
+		}
+
+		seats = append(seats, seat)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status": fiber.StatusOK,
+		"data": fiber.Map{
+			"seats": seats,
+		},
 		"message": utils.GetTranslation(lang, "success"),
 	})
 }

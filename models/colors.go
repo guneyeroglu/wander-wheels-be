@@ -25,7 +25,7 @@ func GetAllColors(c *fiber.Ctx) error {
 			CASE 
 				WHEN $1 = 'tr_TR' then name_tr
 				ELSE name_en
-			END as name,
+			END AS name,
 			code
 		FROM colors
 		ORDER BY id ASC

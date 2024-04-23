@@ -24,14 +24,14 @@ func GetAllFuels(c *fiber.Ctx) error {
 			CASE 
 				WHEN $1 = 'tr_TR' then name_tr
 				ELSE name_en
-			END as name
+			END AS name
 		FROM fuels
 		ORDER BY id ASC
 	`
 
 	rows, err := db.Query(
-		query, //query
-		lang,  //$1
+		query, // query
+		lang,  // $1
 	)
 
 	if err != nil {

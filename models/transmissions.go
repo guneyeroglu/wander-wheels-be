@@ -24,12 +24,15 @@ func GetAllTransmissions(c *fiber.Ctx) error {
 			CASE 
 				WHEN $1 = 'tr_TR' then name_tr
 				ELSE name_en
-			END as name
+			END AS name
 		FROM transmissions
 		ORDER BY id ASC
 	`
 
-	rows, err := db.Query(query, lang)
+	rows, err := db.Query(
+		query, // query
+		lang,  // $1
+	)
 
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{

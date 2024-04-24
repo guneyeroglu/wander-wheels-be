@@ -23,6 +23,7 @@ func main() {
 	api.Get("/brands", models.GetAllBrands)
 	api.Get("/models", models.GetAllModels)
 	api.Get("/cities", models.GetAllCities)
+	api.Get("/cities/:id", models.GetCityById)
 	api.Post("/cars", models.GetAllCars)
 	api.Get("/cars/:id", models.GetCarById)
 	api.Get("/price-range", models.GetPriceRange)

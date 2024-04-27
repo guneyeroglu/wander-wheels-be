@@ -26,6 +26,7 @@ func main() {
 	api.Get("/cities/:id", models.GetCityById)
 	api.Post("/cars", models.GetAllCars)
 	api.Get("/cars/:id", models.GetCarById)
+	api.Post("/rent-car", models.CreateRental)
 	api.Get("/price-range", models.GetPriceRange)
 	api.Get("/year-range", models.GetYearRange)
 	api.Get("/seats", models.GetSeats)

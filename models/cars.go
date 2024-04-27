@@ -492,3 +492,113 @@ func GetSeats(c *fiber.Ctx) error {
 		"message": utils.GetTranslation(lang, "success"),
 	})
 }
+
+type RentCar struct {
+	UserId       uuid.UUID `json:"userId"`
+	CarAndCityId uuid.UUID `json:"carAndCityId"`
+	StartDate    time.Time `json:"startDate"`
+	EndDate      time.Time `json:"endDate"`
+}
+
+type RentedCar struct {
+	Id uuid.UUID `json:"id"`
+}
+
+func CreateRental(c *fiber.Ctx) error {
+	lang := c.Locals("lang").(string)
+
+	db := database.ConnectDb()
+	defer db.Close()
+
+	query := `
+		INSERT INTO rentals (
+			user_id,
+			car_and_city_id,
+			start_date,
+			end_date
+		) VALUES (
+			$1,
+			$2,
+			$3,
+			$4
+		)
+	`
+	queryForFindingCarAndCity := `
+		SELECT
+			car_and_city_id
+		FROM rentals
+		WHERE 
+			(car_and_city_id = $1)
+		ORDER BY id
+	`
+
+	var rent RentCar
+
+	if err := c.BodyParser(&rent); err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
+	}
+
+	rowsForFindingCarAndCity, errForFindingCarAndCity := db.Query(
+		queryForFindingCarAndCity, // query
+		rent.CarAndCityId,         // 1
+	)
+
+	if errForFindingCarAndCity != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": errForFindingCarAndCity.Error(),
+		})
+	}
+
+	var cars []RentedCar
+
+	for rowsForFindingCarAndCity.Next() {
+		var car RentedCar
+		err := rowsForFindingCarAndCity.Scan(
+			&car.Id,
+		)
+
+		if err != nil {
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+				"status":  fiber.StatusUnprocessableEntity,
+				"message": err.Error(),
+			})
+		}
+
+		cars = append(cars, car)
+	}
+
+	if cars != nil {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"status":  fiber.StatusConflict,
+			"message": utils.GetTranslation(lang, "carAlreadyRented"),
+		})
+	}
+
+	formatDate := "2006-01-02"
+	formattedStartDate := rent.StartDate.Format(formatDate)
+	formattedEndDate := rent.EndDate.Format(formatDate)
+
+	_, err := db.Query(
+		query,              // query
+		rent.UserId,        // $1
+		rent.CarAndCityId,  // $2
+		formattedStartDate, // $3
+		formattedEndDate,   // $4
+	)
+
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":  fiber.StatusOK,
+		"message": utils.GetTranslation(lang, "rentalSuccess"),
+	})
+}

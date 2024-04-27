@@ -3,12 +3,16 @@
     "success": "İşlem başarılı!",
     "notFound": "Bulunamadı",
     "newUserCreated": "Başarıyla hesap oluşturuldu.",
-    "userAlreadyExists": "Bu kullanıcı zaten mevcut."
+    "userAlreadyExists": "Bu kullanıcı zaten mevcut.",
+    "carAlreadyRented": "Bu araç zaten kiralanmış.",
+    "rentalSuccess": "Araç kiralama işlemi başarılı!"
   },
   "en_EN": {
     "success": "Process successful!",
     "notFound": "Not Found",
     "newUserCreated": "Successfully created account.",
-    "userAlreadyExists": "This user already exists."
+    "userAlreadyExists": "This user already exists.",
+    "carAlreadyRented": "This car already rented.",
+    "rentalSuccess": "Car rental process successful!"
   }
 }

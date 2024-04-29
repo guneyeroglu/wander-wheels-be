@@ -1,9 +1,12 @@
 package models
 
 import (
+	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/guneyeroglu/wander-wheels-be/database"
 	"github.com/guneyeroglu/wander-wheels-be/utils"
@@ -528,7 +531,9 @@ func CreateRental(c *fiber.Ctx) error {
 			car_and_city_id
 		FROM rentals
 		WHERE 
-			(car_and_city_id = $1)
+			(car_and_city_id = $1) AND
+			((start_date BETWEEN $2 AND $3) OR
+			(end_date BETWEEN $2 AND $3))
 		ORDER BY id
 	`
 
@@ -541,9 +546,16 @@ func CreateRental(c *fiber.Ctx) error {
 		})
 	}
 
+	formatDate := "2006-01-02"
+	formattedStartDate := rent.StartDate.Format(formatDate)
+	formattedEndDate := rent.EndDate.Format(formatDate)
+
 	rowsForFindingCarAndCity, errForFindingCarAndCity := db.Query(
 		queryForFindingCarAndCity, // query
-		rent.CarAndCityId,         // 1
+		rent.CarAndCityId,         // $1
+		formattedStartDate,        // $2
+		formattedEndDate,          // $3
+
 	)
 
 	if errForFindingCarAndCity != nil {
@@ -578,11 +590,23 @@ func CreateRental(c *fiber.Ctx) error {
 		})
 	}
 
-	formatDate := "2006-01-02"
-	formattedStartDate := rent.StartDate.Format(formatDate)
-	formattedEndDate := rent.EndDate.Format(formatDate)
+	tokenType := os.Getenv("JWT_TOKEN_TYPE")
+	jwtSecretCode := os.Getenv("JWT_SECRET_CODE")
+	tokenString := strings.Join(strings.Split(c.Get("Authorization"), tokenType), "")
+	claims := jwt.MapClaims{}
 
-	_, err := db.Query(
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtSecretCode), nil
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"status":  fiber.StatusUnprocessableEntity,
+			"message": err.Error(),
+		})
+	}
+
+	_, err = db.Query(
 		query,              // query
 		rent.UserId,        // $1
 		rent.CarAndCityId,  // $2

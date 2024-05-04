@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -31,5 +32,11 @@ func main() {
 	api.Get("/year-range", models.GetYearRange)
 	api.Get("/seats", models.GetSeats)
 
-	log.Fatal(app.Listen(":3000"))
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "3000"
+	}
+
+	log.Fatal(app.Listen("0.0.0.0:" + port))
 }

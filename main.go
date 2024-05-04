@@ -10,35 +10,36 @@ import (
 	"github.com/guneyeroglu/wander-wheels-be/models"
 )
 
+func GetPort(port string) string {
+	if port == "" {
+		return ":3000"
+	}
+
+	return ":" + port
+}
+
 func main() {
 	app := fiber.New()
 	app.Use(cors.New(), middleware.Language, middleware.Jwt)
-	// app := app.Group("/app")
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, WanderWheels")
-	})
-	app.Post("/login", models.Login)
-	app.Post("/sign-up", models.SignUp)
-	app.Get("/user-info", models.GetUserInfo)
-	app.Get("/fuels", models.GetAllFuels)
-	app.Get("/transmissions", models.GetAllTransmissions)
-	app.Get("/colors", models.GetAllColors)
-	app.Get("/brands", models.GetAllBrands)
-	app.Get("/models", models.GetAllModels)
-	app.Get("/cities", models.GetAllCities)
-	app.Get("/cities/:id", models.GetCityById)
-	app.Post("/cars", models.GetAllCars)
-	app.Get("/cars/:id", models.GetCarById)
-	app.Post("/rent-car", models.CreateRental)
-	app.Get("/price-range", models.GetPriceRange)
-	app.Get("/year-range", models.GetYearRange)
-	app.Get("/seats", models.GetSeats)
+	api := app.Group("/api")
+
+	api.Post("/login", models.Login)
+	api.Post("/sign-up", models.SignUp)
+	api.Get("/user-info", models.GetUserInfo)
+	api.Get("/fuels", models.GetAllFuels)
+	api.Get("/transmissions", models.GetAllTransmissions)
+	api.Get("/colors", models.GetAllColors)
+	api.Get("/brands", models.GetAllBrands)
+	api.Get("/models", models.GetAllModels)
+	api.Get("/cities", models.GetAllCities)
+	api.Get("/cities/:id", models.GetCityById)
+	api.Post("/cars", models.GetAllCars)
+	api.Get("/cars/:id", models.GetCarById)
+	api.Post("/rent-car", models.CreateRental)
+	api.Get("/price-range", models.GetPriceRange)
+	api.Get("/year-range", models.GetYearRange)
+	api.Get("/seats", models.GetSeats)
 
 	port := os.Getenv("PORT")
-
-	if port == "" {
-		port = "3000"
-	}
-
-	log.Fatal(app.Listen("0.0.0.0:" + port))
+	log.Fatal(app.Listen(GetPort(port)))
 }

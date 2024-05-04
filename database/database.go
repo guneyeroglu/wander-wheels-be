@@ -19,9 +19,9 @@ func ConnectDb() *sql.DB {
 
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
 	dbConnectionUrl := os.Getenv("DB_CONNECTION_URL")
 	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
 	dbSslMode := os.Getenv("DB_SSL_MODE")
 
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", dbUsername, dbPassword, dbConnectionUrl, dbPort, dbName, dbSslMode)

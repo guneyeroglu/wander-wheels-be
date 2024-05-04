@@ -13,12 +13,12 @@ func ConnectDb() *sql.DB {
 	viper.AddConfigPath(".")
 	viper.SetConfigFile(".env")
 
-	viper.ReadInConfig()
+	err := viper.ReadInConfig()
 
-	// if err != nil {
-	// 	log.Fatal("Error", err)
+	if err != nil {
+		log.Fatal("Error", err)
 
-	// }
+	}
 
 	dbUsername := viper.Get("DB_USERNAME").(string)
 	dbPassword := viper.Get("DB_PASSWORD").(string)

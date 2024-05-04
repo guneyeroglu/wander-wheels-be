@@ -61,7 +61,6 @@ type Translations map[string]map[string]string
 
 func GetAllCars(c *fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
-
 	db := database.ConnectDb()
 	defer db.Close()
 
@@ -223,7 +222,6 @@ func GetAllCars(c *fiber.Ctx) error {
 func GetCarById(c *fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
 	carAndCityId := c.Params("id")
-
 	db := database.ConnectDb()
 	defer db.Close()
 
@@ -509,7 +507,6 @@ type RentedCar struct {
 
 func CreateRental(c *fiber.Ctx) error {
 	lang := c.Locals("lang").(string)
-
 	db := database.ConnectDb()
 	defer db.Close()
 

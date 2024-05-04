@@ -5,7 +5,6 @@ import (
 )
 
 func Language(c *fiber.Ctx) error {
-
 	lang := c.Get("Accept-Language")
 
 	if lang == "" {

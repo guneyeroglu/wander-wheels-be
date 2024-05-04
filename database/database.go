@@ -20,10 +20,11 @@ func ConnectDb() *sql.DB {
 	dbUsername := os.Getenv("DB_USERNAME")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
+	dbConnectionUrl := os.Getenv("DB_CONNECTION_URL")
 	dbPort := os.Getenv("DB_PORT")
 	dbSslMode := os.Getenv("DB_SSL_MODE")
 
-	connectionString := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=%s", dbUsername, dbPassword, dbPort, dbName, dbSslMode)
+	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", dbUsername, dbPassword, dbConnectionUrl, dbPort, dbName, dbSslMode)
 	db, err := sql.Open("postgres", connectionString)
 
 	if err != nil {

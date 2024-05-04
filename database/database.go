@@ -10,7 +10,14 @@ import (
 )
 
 func ConnectDb() *sql.DB {
-	viper.AutomaticEnv()
+	viper.AddConfigPath(".")
+	viper.SetConfigFile(".env")
+
+	err := viper.ReadInConfig()
+
+	if err != nil {
+		viper.AutomaticEnv()
+	}
 
 	dbUsername := viper.GetString("DB_USERNAME")
 	dbPassword := viper.GetString("DB_PASSWORD")

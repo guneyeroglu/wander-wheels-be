@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,14 +9,12 @@ import (
 	"github.com/guneyeroglu/wander-wheels-be/models"
 )
 
-func GetPort(port string) string {
-	base := "0.0.0.0:"
-
-	if port == "" {
-		return base + "3000"
+func envPortOr(port string) string {
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		return ":" + envPort
 	}
 
-	return base + port
+	return ":" + port
 }
 
 func main() {
@@ -42,7 +39,5 @@ func main() {
 	api.Get("/year-range", models.GetYearRange)
 	api.Get("/seats", models.GetSeats)
 
-	port := os.Getenv("PORT")
-
-	log.Fatal(app.Listen(GetPort(port)))
+	app.Listen(envPortOr("3000"))
 }

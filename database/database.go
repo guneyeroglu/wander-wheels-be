@@ -10,26 +10,13 @@ import (
 )
 
 func ConnectDb() *sql.DB {
-	viper.AddConfigPath(".")
-	viper.SetConfigFile(".env")
+	viper.AutomaticEnv()
 
-	viper.SetDefault("type", "dev")
-	typeName := viper.Get("type").(string)
-
-	fmt.Println(typeName)
-
-	err := viper.ReadInConfig()
-
-	if err != nil {
-		log.Fatal("Error", err)
-
-	}
-
-	dbUsername := viper.Get("DB_USERNAME").(string)
-	dbPassword := viper.Get("DB_PASSWORD").(string)
-	dbConnectionUrl := viper.Get("DB_CONNECTION_URL").(string)
-	dbPort := viper.Get("DB_PORT").(string)
-	dbName := viper.Get("DB_NAME").(string)
+	dbUsername := viper.GetString("DB_USERNAME")
+	dbPassword := viper.GetString("DB_PASSWORD")
+	dbConnectionUrl := viper.GetString("DB_CONNECTION_URL")
+	dbPort := viper.GetString("DB_PORT")
+	dbName := viper.GetString("DB_NAME")
 
 	connectionString := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUsername, dbPassword, dbConnectionUrl, dbPort, dbName)
 	db, err := sql.Open("postgres", connectionString)

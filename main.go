@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -11,11 +12,13 @@ import (
 )
 
 func GetPort(port string) string {
+	base := "0.0.0.0:"
+
 	if port == "" {
-		return ":3000"
+		return base + "3000"
 	}
 
-	return ":" + port
+	return base + port
 }
 
 func main() {
@@ -41,5 +44,7 @@ func main() {
 	api.Get("/seats", models.GetSeats)
 
 	port := os.Getenv("PORT")
+	fmt.Println("aynen", port)
+
 	log.Fatal(app.Listen(GetPort(port)))
 }

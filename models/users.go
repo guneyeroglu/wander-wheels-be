@@ -246,8 +246,7 @@ func SignUp(c *fiber.Ctx) error {
 		FROM users AS U
 		JOIN roles AS R ON r.id = u.role_id
 		WHERE 
-			(U.username = $1) AND
-			(U.password = $2)
+			(U.username = $1)
 		ORDER BY U.username ASC
 	`
 
@@ -265,7 +264,6 @@ func SignUp(c *fiber.Ctx) error {
 	rowsForFindingUser, errForFindingUser := db.Query(
 		queryForFindingUser, // query
 		data.Username,       // $1
-		data.Password,       // $2
 	)
 
 	if errForFindingUser != nil {

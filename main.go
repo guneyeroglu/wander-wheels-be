@@ -14,7 +14,9 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New(), middleware.Language, middleware.Jwt)
 	api := app.Group("/api")
-
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, WanderWheels")
+	})
 	api.Post("/login", models.Login)
 	api.Post("/sign-up", models.SignUp)
 	api.Get("/user-info", models.GetUserInfo)

@@ -13,6 +13,11 @@ func ConnectDb() *sql.DB {
 	viper.AddConfigPath(".")
 	viper.SetConfigFile(".env")
 
+	viper.SetDefault("type", "dev")
+	typeName := viper.Get("type").(string)
+
+	fmt.Println(typeName)
+
 	err := viper.ReadInConfig()
 
 	if err != nil {

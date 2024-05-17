@@ -19,18 +19,20 @@ type Images struct {
 }
 
 type CarModel struct {
-	Id           uuid.UUID    `json:"id"`
-	Model        Model        `json:"model"`
-	Color        Color        `json:"color"`
-	Transmission Transmission `json:"transmission"`
-	Fuel         Fuel         `json:"fuel"`
-	Year         int          `json:"year"`
-	DailyPrice   int          `json:"dailyPrice"`
-	Images       Images       `json:"images"`
-	Seat         int          `json:"seat"`
-	City         City         `json:"city"`
-	CreatedDate  time.Time    `json:"createdDate"`
-	UpdatedDate  time.Time    `json:"updatedDate"`
+	Id                   uuid.UUID    `json:"id"`
+	Model                Model        `json:"model"`
+	Color                Color        `json:"color"`
+	Transmission         Transmission `json:"transmission"`
+	Fuel                 Fuel         `json:"fuel"`
+	Year                 int          `json:"year"`
+	DailyPrice           int          `json:"dailyPrice"`
+	DiscountStatus       bool         `json:"discountStatus"`
+	DiscountedDailyPrice *int         `json:"discountedDailyPrice"`
+	Images               Images       `json:"images"`
+	Seat                 int          `json:"seat"`
+	City                 City         `json:"city"`
+	CreatedDate          time.Time    `json:"createdDate"`
+	UpdatedDate          time.Time    `json:"updatedDate"`
 }
 
 type Car struct {
@@ -90,7 +92,7 @@ func GetAllCars(c *fiber.Ctx) error {
 				WHEN $1 = 'tr_TR' then F.name_tr
 				ELSE F.name_en
 			END AS transmission_name,
-			CA.year, 
+			CA.year AS year, 
 			CA.daily_price,
 			CA.featured_image, 
 			CA.other_images,
@@ -98,7 +100,8 @@ func GetAllCars(c *fiber.Ctx) error {
 			CI.id,
 			CI.name,
 			CA.created_date,
-			CA.updated_date
+			CA.updated_date,
+			CA.discounted_daily_price
 		FROM cars_and_cities AS CC
 		JOIN cars AS CA ON CA.id = CC.car_id
 		JOIN models AS M ON M.id = CA.model_id
@@ -192,6 +195,7 @@ func GetAllCars(c *fiber.Ctx) error {
 			&city.Id, &city.Name,
 			&car.CreatedDate,
 			&car.UpdatedDate,
+			&car.DiscountedDailyPrice,
 		)
 
 		if err != nil {
@@ -207,8 +211,12 @@ func GetAllCars(c *fiber.Ctx) error {
 		car.Fuel = fuel
 		car.Images = images
 		car.City = city
+		if car.DiscountedDailyPrice != nil {
+			car.DiscountStatus = true
+		} else {
+			car.DiscountStatus = false
+		}
 		carAndCity.Car = car
-
 		cars = append(cars, carAndCity)
 	}
 
@@ -259,7 +267,8 @@ func GetCarById(c *fiber.Ctx) error {
 			CI.id,
 			CI.name,
 			CA.created_date,
-			CA.updated_date
+			CA.updated_date,
+			CA.discounted_daily_price
 		FROM cars_and_cities AS CC
 		JOIN cars AS CA ON CA.id = CC.car_id
 		JOIN models AS M ON M.id = CA.model_id
@@ -309,6 +318,7 @@ func GetCarById(c *fiber.Ctx) error {
 			&city.Id, &city.Name,
 			&car.CreatedDate,
 			&car.UpdatedDate,
+			&car.DiscountedDailyPrice,
 		)
 
 		if err != nil {
@@ -324,6 +334,11 @@ func GetCarById(c *fiber.Ctx) error {
 		car.Fuel = fuel
 		car.Images = images
 		car.City = city
+		if car.DiscountedDailyPrice != nil {
+			car.DiscountStatus = true
+		} else {
+			car.DiscountStatus = false
+		}
 		carAndCity.Car = car
 
 		cars = append(cars, carAndCity)
